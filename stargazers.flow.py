@@ -91,7 +91,7 @@ class NotificationMessage(Task):
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": "See all the new stargazers <https://github.com/{owner}/{repository}/stargazers|here>",
+                        "text": f"See all the new stargazers <https://github.com/{owner}/{repository}/stargazers|here>",
                     },
                 },
             ]
