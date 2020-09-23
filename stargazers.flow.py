@@ -71,8 +71,8 @@ with Flow("Stargazers", schedule=schedule) as flow:
         NotificationMessage
         Notify [SlackTask]
     """
-    repository = Parameter("repository", default="prefect", required=True)
-    owner = Parameter("owner", default="PrefectHQ", required=True)
+    repository = Parameter("repository", default="prefect")
+    owner = Parameter("owner", default="PrefectHQ")
 
     stars = GetStars(name="Get Stars", max_retries=2, retry_delay=timedelta(minutes=1))(
         repository=repository, owner=owner
