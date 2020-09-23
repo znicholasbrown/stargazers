@@ -33,7 +33,7 @@ class ShouldNotify(Task):
     def run(self, stars: int) -> [str, None]:
         now = prefect.context["date"]
         return stars % 1000 == 0 or (
-            now.hour == 9 and now.minute > 0 and now.minute < 5
+            now.hour == 9 and now.minute >= 0 and now.minute <= 5
         )
 
 
