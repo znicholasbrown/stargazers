@@ -1,5 +1,6 @@
 import prefect
 from prefect import Flow, Task, Parameter, case
+from prefect.client import Secret
 from prefect.tasks.notifications import SlackTask
 from prefect.schedules import Schedule
 from prefect.schedules.clocks import IntervalClock
@@ -37,8 +38,7 @@ class GetStars(Task):
         )
 
         result = requests.post(
-            "https://api.github.com/graphql",
-            json=request_body,
+            "https://api.github.com/graphql", json=request_body, headers=headers
         )
 
         result.raise_for_status()
@@ -57,7 +57,10 @@ class GetStars(Task):
 
         variables = {"repository": repository, "owner": owner}
 
-        data = self.execute(query=query, variables=variables)
+        token = Secret("GITHUB_AUTH_TOKEN").get()
+        headers = {"Authorization": f"bearer {token}"}
+
+        data = self.execute(query=query, variables=variables, headers=headers)
         return data["data"]["repository"]["stargazers"]["totalCount"]
 
 
