@@ -39,7 +39,6 @@ class GetStars(Task):
         result = requests.post(
             "https://api.github.com/graphql",
             json=request_body,
-            headers=self.__request_headers(headers),
         )
 
         result.raise_for_status()
