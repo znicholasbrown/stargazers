@@ -46,7 +46,7 @@ class GetStars(Task):
 
     def run(self, repository: str, owner: str) -> int:
         query = """
-        query Stargazers($repository: String, $owner: String) {
+        query Stargazers($repository: String!, $owner: String!) {
             repository(name: $repository, owner: $owner) {
                 stargazers {
                     totalCount
@@ -95,8 +95,8 @@ class NotificationMessage(Task):
         }
 
 
-schedule = Schedule(clocks=[IntervalClock(timedelta(minutes=5))], filters=[is_weekday])
-with Flow("Stargazers", schedule=schedule) as flow:
+# schedule = Schedule(clocks=[IntervalClock(timedelta(minutes=5))], filters=[is_weekday])
+with Flow("Stargazers") as flow:
     """
     Tasks:
         Repository [Parameter]
@@ -129,4 +129,5 @@ flow.storage = GitHub(
 )
 
 
-flow.register(project_name="PROJECT: Nicholas")
+# flow.register(project_name="PROJECT: Nicholas")
+flow.run()
