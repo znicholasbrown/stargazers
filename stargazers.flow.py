@@ -67,9 +67,7 @@ class GetStars(Task):
 class ShouldNotify(Task):
     def run(self, stars: int) -> [str, None]:
         now = prefect.context["date"]
-        return stars % 1000 == 0 or (
-            now.hour == 9 and now.minute >= 0 and now.minute <= 5
-        )
+        return stars % 5 == 0 or (now.hour == 9 and now.minute >= 0 and now.minute <= 5)
 
 
 class NotificationMessage(Task):
@@ -80,7 +78,7 @@ class NotificationMessage(Task):
                     "type": "header",
                     "text": {
                         "type": "plain_text",
-                        "text": f"⭐⭐The {repository} repo has reached {stars}⭐⭐!",
+                        "text": f"⭐⭐ The {repository.upper()} repo has reached {stars} stars! ⭐⭐",
                         "emoji": True,
                     },
                 },
@@ -95,8 +93,8 @@ class NotificationMessage(Task):
         }
 
 
-# schedule = Schedule(clocks=[IntervalClock(timedelta(minutes=5))], filters=[is_weekday])
-with Flow("Stargazers") as flow:
+schedule = Schedule(clocks=[IntervalClock(timedelta(minutes=5))], filters=[is_weekday])
+with Flow("Stargazers", schedule=schedule) as flow:
     """
     Tasks:
         Repository [Parameter]
@@ -129,5 +127,5 @@ flow.storage = GitHub(
 )
 
 
-# flow.register(project_name="PROJECT: Nicholas")
-flow.run()
+flow.register(project_name="PROJECT: Nicholas")
+# flow.run()
