@@ -5,7 +5,7 @@ from prefect.schedules import Schedule
 from prefect.schedules.clocks import IntervalClock
 from prefect.schedules.filters import is_weekday
 from python_graphql_client import GraphqlClient
-
+from prefect.environments.storage import GitHub
 
 from datetime import timedelta
 
@@ -86,3 +86,12 @@ with Flow("Stargazers", schedule=schedule) as flow:
         notification = SlackTask(webhook_secret="STARGAZERS_SLACK_WEBHOOK_TOKEN")(
             message=message
         )
+
+flow.storage = GitHub(
+    repo="znicholasbrown/stargazers",
+    path="/stargazers.flow.py",
+    secrets=["GITHUB_AUTH_TOKEN"],
+)
+
+
+flow.register(project_name="PROJECT: Nicholas")
