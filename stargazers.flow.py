@@ -67,6 +67,9 @@ class GetStars(Task):
 class ShouldNotify(Task):
     def run(self, stars: int) -> [str, None]:
         now = prefect.context["date"]
+        # This is pretty brittle,
+        # should probably come up with a better way to handle this
+        # since it'll notify constantly on intervals of 1000
         return stars % 1000 == 0 or (
             now.hour == 9 and now.minute >= 0 and now.minute <= 5
         )
