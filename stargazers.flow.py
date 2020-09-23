@@ -31,7 +31,7 @@ class GetStars(Task):
         variables: dict = None,
         operation_name: str = None,
         headers: dict = None,
-    ) -> JSON:
+    ) -> any:
         request_body = self.__request_body(
             query=query, variables=variables, operation_name=operation_name
         )
