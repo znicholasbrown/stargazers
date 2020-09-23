@@ -4,13 +4,47 @@ from prefect.tasks.notifications import SlackTask
 from prefect.schedules import Schedule
 from prefect.schedules.clocks import IntervalClock
 from prefect.schedules.filters import is_weekday
-from python_graphql_client import GraphqlClient
 from prefect.environments.storage import GitHub
 
+import json
+import requests
 from datetime import timedelta
 
 
 class GetStars(Task):
+    def __request_body(
+        self, query: str, variables: dict = None, operation_name: str = None
+    ) -> dict:
+        json = {"query": query}
+
+        if variables:
+            json["variables"] = variables
+
+        if operation_name:
+            json["operationName"] = operation_name
+
+        return json
+
+    def execute(
+        self,
+        query: str,
+        variables: dict = None,
+        operation_name: str = None,
+        headers: dict = None,
+    ) -> JSON:
+        request_body = self.__request_body(
+            query=query, variables=variables, operation_name=operation_name
+        )
+
+        result = requests.post(
+            "https://api.github.com/graphql",
+            json=request_body,
+            headers=self.__request_headers(headers),
+        )
+
+        result.raise_for_status()
+        return result.json()
+
     def run(self, repository: str, owner: str) -> int:
         query = """
         query Stargazers($repository: String, $owner: String) {
@@ -23,9 +57,8 @@ class GetStars(Task):
         """
 
         variables = {"repository": repository, "owner": owner}
-        client = GraphqlClient(endpoint="https://api.github.com/graphql")
 
-        data = client.execute(query=query, variables=variables)
+        data = self.execute(query=query, variables=variables)
         return data["data"]["repository"]["stargazers"]["totalCount"]
 
 
